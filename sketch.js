@@ -29,24 +29,24 @@ function preload(){
 }
 
 function setup(){
-  createCanvas(600,200)
+  createCanvas(windowWidth, windowHeight);
   
-  trex = createSprite (50,160,20,50);
+  trex = createSprite (50, windowHeight -90, 20, 50);
   trex.scale=0.5;
   trex.x=50;
   trex.addAnimation ("running", trex_running);
   trex.addAnimation("collided",trex_collided);
   
-  ground = createSprite (200,180,400,20);
+  ground = createSprite (windowWidth/2, windowHeight, 1200, 10);
   ground.addImage("ground", groundImage);
-  invisibleGround = createSprite(200,190,400,10);
+  invisibleGround = createSprite(300, windowHeight +15, 600, 40);
   invisibleGround.visible = false;
 
-  gameOver = createSprite (300, 100);
+  gameOver = createSprite (windowWidth/2, windowHeight/2 -20, 400, 20);
   gameOver.addImage (gameOverImg);
   gameOver.scale = 0.9;
 
-  restart = createSprite (300, 140);
+  restart = createSprite (windowWidth/2, windowHeight/2 +20);
   restart.addImage (restartImg);
   restart.scale = 0.4;
 
@@ -63,19 +63,20 @@ function draw(){
   background(160);
   fill ("white");
   stroke ("white");
-  text("Score: "+ score, 500,50);
+  text("Score: "+ score, 20, 30);
 
   if(gameState === PLAY){
-    score = score+ Math.round(frameCount/ 300);
+    score = score+ Math.round(getFrameRate()/60);
     ground.velocityX = -(4 + 2* score/500);
     
     if(score > 0 && score%100 === 0){
       checkPointSound.play();
     }
 
-    if(keyDown(UP_ARROW) && trex.y>=140){
+    if(TouchList.length >0 || keyDown(UP_ARROW) && trex.y>=600){
       trex.velocityY = -10;
       jumpSound.play();
+      touch = [];
     }
 
     if(ground.x<0){
@@ -129,21 +130,21 @@ function reset(){
 
 function spawnClouds(){
   if(frameCount% 80 === 0){
-  cloud = createSprite(600,100,40,10);
+  cloud = createSprite(windowWidth, 100, 40, 10);
   cloud.velocityX = -5;
   cloud.addImage (cloudImage);
   cloud.scale = 0.7;
-  cloud.y = Math.round(random(10,60));
+  cloud.y = Math.round(random(100, 220));
   cloud.depth = trex.depth;
   trex.depth = trex.depth + 1;
-  cloud.lifetime = 120;
+  cloud.lifetime = 500;
   cloudsGroup.add(cloud);
   }
 }
 
 function spawnObstacles(){
 if(frameCount% 60 === 0){
-  obstacle = createSprite(600,165,10,40);
+  obstacle = createSprite(windowWidth, windowHeight -20, 10, 40);
   obstacle.velocityX = -(6 + score/100);
 
 var rand = Math.round(random(1,6));
@@ -164,7 +165,7 @@ var rand = Math.round(random(1,6));
     default: break;
     }
     obstacle.scale = 0.6;
-    obstacle.lifetime = 100;
+    obstacle.lifetime = 300;
     obstaclesGroup.add(obstacle);
   }
 }
